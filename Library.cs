@@ -51,7 +51,8 @@ namespace Credential
         private enum CREDUI_FLAGS
         {
             CREDUIWIN_GENERIC = 0x1,
-            CREDUIWIN_CHECKBOX = 0x2
+            CREDUIWIN_CHECKBOX = 0x2,
+            CREDUI_FLAGS_PERSIST = 0x1000
         }
 
         private const int CRED_TYPE_GENERIC = 1;
@@ -102,7 +103,7 @@ namespace Credential
 
             var userNameBuilder = new StringBuilder(MAX_USERNAME_LENGTH);
             var passwordBuilder = new StringBuilder(MAX_PASSWORD_LENGTH);
-            bool save = false;
+            bool save = true;
 
             int result = CredUIPromptForCredentialsW(
                 ref uiInfo,
@@ -114,7 +115,7 @@ namespace Credential
                 passwordBuilder,
                 MAX_PASSWORD_LENGTH,
                 ref save,
-                CREDUI_FLAGS.CREDUIWIN_GENERIC | CREDUI_FLAGS.CREDUIWIN_CHECKBOX);
+                CREDUI_FLAGS.CREDUIWIN_GENERIC | CREDUI_FLAGS.CREDUI_FLAGS_PERSIST);
 
             if (result == ERROR_CANCELLED)
                 return 2;
@@ -130,7 +131,7 @@ namespace Credential
                 UserName = userNameBuilder.ToString(),
                 CredentialBlob = Marshal.StringToHGlobalUni(passwordBuilder.ToString()),
                 CredentialBlobSize = credentialBlob.Length,
-                Persist = save ? persistence : CRED_PERSIST_SESSION
+                Persist = persistence
             };
 
             try
